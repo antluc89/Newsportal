@@ -6,6 +6,9 @@ from datetime import datetime
 from .filters import *
 from .forms import *
 from .resources import *
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.views.generic import TemplateView
 
 
 class PostList(ListView):
@@ -57,7 +60,8 @@ class NewsSearch(ListView):
         return context
 
 
-class PostCreate(CreateView):
+class PostCreate(CreateView, PermissionRequiredMixin):
+    permission_required = 'news.post_create'
     form_class = PostForm
     model = Post
     template_name = 'post_create.html'
@@ -70,7 +74,8 @@ class PostCreate(CreateView):
         return super().form_valid(form)
 
 
-class PostEdit(UpdateView):
+class PostEdit(UpdateView, LoginRequiredMixin, PermissionRequiredMixin, TemplateView):
+    permission_required = 'news.post_edit'
     form_class = PostForm
     model = Post
     template_name = 'post_edit.html'
